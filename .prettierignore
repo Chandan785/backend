@@ -1,0 +1,7 @@
+
+.env
+*.env
+.env.*
+/.vscode
+# Ignore node modules
+/node_modules
