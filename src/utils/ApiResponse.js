@@ -5,4 +5,4 @@ class ApiResponse{
         this.message = massage;
         this.success = success;
     }
-}
+} 
