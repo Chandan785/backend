@@ -14,7 +14,7 @@ const userSchema = new Schema({
         index: true
     },
     email: { 
-        type: email,
+        type: String, 
         required: true,
         unique: true,
         trim: true,
@@ -22,7 +22,7 @@ const userSchema = new Schema({
         
     },
 
-    FullName: { 
+    fullname: { 
         type: String,
         required: true,
         unique: true,
@@ -43,7 +43,7 @@ const userSchema = new Schema({
         ref: 'Video',
     },
 
-    passwaord: { 
+    password: { 
         type: String,
         required: [true,'password is required'],
         minlength: 6
