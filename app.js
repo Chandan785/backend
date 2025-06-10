@@ -17,10 +17,10 @@ app.use(express.static('public'));
 
 // Import routes
 import userRouter from './src/routes/user.routes.js';
-
+//http://localhost:3000/api/v1/users/ragister
 
 //route decleration
-app.use('/users', userRouter);
+app.use('/api/v1/users', userRouter);
 
 
 export {app};
