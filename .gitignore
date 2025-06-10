@@ -3,3 +3,5 @@
 .env
 # Ignore node modules
 /node_modules
+/uploads/**
+!/public/temp/.gitkeep
