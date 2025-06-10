@@ -9,7 +9,7 @@ import fs from 'fs';
 
 
 const uploaadOnCloudinary = async (filePath) => {
-    try{
+    try{ 
          if(!localpath) return null;
    const response= await cloudinary.uploader.upload(localfilepath,{
     resource_type: "auto",
