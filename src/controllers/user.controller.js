@@ -3,7 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.models.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-
+import { varifyJWT } from "../middleware/auth.middleware.js";
 const registerUser = asyncHandler(async (req, res) => {
   // Step 1: Get user details from frontend
   const { Username, FullName, email, password } = req.body;
@@ -75,4 +75,101 @@ const registerUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, createdUser, "User registered successfully"));
 });
 
-export { registerUser };
+
+const generateAccessTokenAndRefreshToken = async(userId) => {
+  try{
+    const user = await User.findById(userId);
+  const accessToken = user.generateAccessToken();
+  const refreshToken = user.generateRefreshToken();
+
+   user.refreshToken = refreshToken;
+  await user.save({ validateBeforeSave: false });
+  // Return the tokens
+  return { accessToken, refreshToken };
+  }
+  catch(error){
+    throw new ApiError(500, "something went wrong when generating tokens");
+  }
+   
+}
+
+const loginUser = asyncHandler(async (req, res) => {
+
+
+// login 
+// request body should contain: and take data from database
+//find user by username or email
+// check password
+// access token and refresh token
+//send cookie
+
+
+  // Step 1: Get login details from frontend
+  const { usernameOrEmail, password } = req.body;
+
+  // Step 2: Validation - check for empty fields
+  if (!usernameOrEmail || !password) {
+    throw new ApiError(400, "Username/Email and password are required");
+  }
+
+  // Step 3: Find user by username or email
+  const user = await User.findOne({
+    $or: [{ Username: usernameOrEmail.toLowerCase() }, { email: usernameOrEmail }],
+  });
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  // Step 4: Check password
+  const isPasswordValid = await user.comparePassword(password);
+  if (!isPasswordValid) {
+    throw new ApiError(401, "Invalid password");
+  }
+
+  // Step 5: Generate access token and refresh token
+  const { accessToken, refreshToken } = await generateAccessTokenAndRefreshToken(user._id);
+
+  const loggedInUser = await User.findById(user._id).select(
+    "-password -refreshToken"
+  );
+
+  // Step 6: Send cookies with tokens
+  const cookieOptions = {
+    httpOnly: true,
+    secure : true, // Set to true if using HTTPS
+  }
+
+// Step 7: Return response
+  return res
+  .status(200)
+  .cookie("accessToken", accessToken, cookieOptions)
+  .cookie("refreshToken", refreshToken, cookieOptions)
+  .json(new ApiResponse(200, { user:loggedInUser,accessToken,refreshToken }, "Login successful"));
+});
+
+const logoutUser = asyncHandler(async (req, res) => {
+  // Step 1: Get user ID from request
+  User.findByIdAndUpdate(req.user._id, {
+     $set:
+      {
+      refreshToken: "undefine"
+    },
+  }, 
+  { new: true });
+
+  // Step 2: Clear cookies
+  const cookieOptions = {
+    httpOnly: true,
+    secure: true // Set to true if using HTTPS
+    
+  };
+  return res
+    .status(200)
+    .cookie("accessToken",cookieOptions)
+    .cookie("refreshToken",  cookieOptions)
+    .json(new ApiResponse(200, {}, "Logout successful"));
+ 
+})
+
+export { registerUser,loginUser,logoutUser };
