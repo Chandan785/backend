@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { loginUser, registerUser,logoutUser } from "../controllers/user.controller.js";
+import { loginUser, registerUser,logoutUser,refreshAccessToken} from "../controllers/user.controller.js";
 import  {upload} from "../middleware/multermiddleware.js"; // Assuming you have a multer setup for file uploads
 const router = Router();
 import { verifyJWT } from "../middleware/auth.middleware.js";
@@ -12,8 +12,11 @@ router.route('/ragister').post(
 
 
     router.route('/login').post(loginUser);
-    //secure routes
+    //secure logout routes
     router.route("/logout").post(verifyJWT, logoutUser);
+    // Refresh access token route
+
+    router.route("/refreshToken").post( refreshAccessToken);
 
 
 export default router;
