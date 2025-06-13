@@ -5,6 +5,8 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import { Subscription } from "../models/subscription.model.js";
+import { Mongoose } from "mongoose";
+import { application } from "express";
 const registerUser = asyncHandler(async (req, res) => {
 
 // Step 1: Get user details from frontend
@@ -394,6 +396,11 @@ if(!Username?.trim()){
  )
 })
 
+
+
+//watch history
+
+
 export { registerUser, 
   loginUser,
    logoutUser, 
@@ -403,7 +410,8 @@ export { registerUser,
    updateUserProfile,
    updateUserAvtar,
   updateUserCoverImage,
-  getUserChennalProfile
+  getUserChennalProfile,
+  WatchHistory
 };
 
 
