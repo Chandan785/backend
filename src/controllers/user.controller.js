@@ -394,6 +394,65 @@ if(!Username?.trim()){
  )
 })
 
+const WatchHistory = asyncHandler(async(req,res)=>{
+const user = await User.aggregate([
+ {
+  $match:{
+    _id: new Mongoose.Types.Objectid(req.user._id)
+  }
+ },
+ {
+  $lookup:{
+    from:"videos",
+    localField:"WatchHistory",
+    foreignField:"_id",
+    as:"WatchHistory",
+    pipeline:
+    [
+      {
+        $lookup:
+        {
+         from:"user",
+         localField:"owner",
+         foreignField:"_id",
+         as:"owner",
+         pipeline:[
+          {
+            $project:{
+              FullName:1,
+              Username:1,
+              avatar:1
+            }
+          },
+           {
+             $addFields:
+             {
+               owner:{
+               $first:"$owner"
+                }
+              }
+            }
+
+         ]
+       }
+      
+     }]
+  }
+ }
+])
+return res
+.status(200)
+.json(
+  new ApiResponse
+  (
+    200,
+    user[0].WatchHistory,"watched history fetched succesfully"
+  )
+)
+
+
+})
+
 export { registerUser, 
   loginUser,
    logoutUser, 
