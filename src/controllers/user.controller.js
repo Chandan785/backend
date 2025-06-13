@@ -4,6 +4,7 @@ import { User } from "../models/user.models.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import { Subscription } from "../models/subscription.model.js";
 
 const registerUser = asyncHandler(async (req, res) => {
 
@@ -319,7 +320,80 @@ const updateUserCoverImage = asyncHandler(async(req,res)=>{
   )
 })
 
+const getUserChennalProfile = asyncHandler(async (req,res)=>{
+const {Username} = req.params
+if(!Username?.trim()){
+  throw new ApiError(400, "username si missing")
+}
 
+ const chennal = User.aggregate([ 
+  {
+     $match: {
+     Username:Username?.toLowerCase()
+  }
+ },
+
+ {
+    $lookup:{
+    from:"subscriptions",
+    localField :"_id",
+    foreignField:"subcriber",
+    as:"subscribedTo"
+    }
+ },
+
+{
+   $lookup:{
+    from:"subscriptions",
+    localField :"_id",
+    foreignField:"chennal",
+    as:"subscribers"
+    }
+},
+
+{
+  $addFields:{
+    SubscriberCount:{
+      $size : "$subscribers"
+    },
+    channelSubsribedToCount:{
+      $size:"$subscribedTo"
+    },
+    isSubcribed:{
+      $cond: {
+        if: {$in: [req.User?._id, "subscribers.subcriber"]},
+        then: true,
+        else:false
+      }
+    }
+  }
+},
+
+{
+  $project:{
+    FullName:1,
+    Username:1,
+    SubscriberCount:1,
+    channelSubsribedToCount:1,
+    isSubcribed:1,
+    avatar:1,
+    coverImage:1,
+    email:1
+  }
+}
+
+ ])
+
+ if(!chennal?.length){
+  throw new ApiError(404,"channel doesnot exist")
+ }
+
+ return res 
+ .status(200)
+ .json(
+  new ApiResponse(200,chennal[0],"user channel fetched succefully")
+ )
+})
 
 export { registerUser, 
   loginUser,
@@ -329,5 +403,10 @@ export { registerUser,
    getCurrentUser, 
    updateUserProfile,
    updateUserAvtar,
-  updateUserCoverImage
+  updateUserCoverImage,
+  getUserChennalProfile
 };
+
+
+
+      
