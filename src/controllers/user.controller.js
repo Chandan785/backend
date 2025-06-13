@@ -418,7 +418,7 @@ const user = await User.aggregate([
         $lookup:
         {
          from:"user",
-         localField:"owner",
+         localField:"owner", 
          foreignField:"_id",
          as:"owner",
          pipeline:[
