@@ -28,12 +28,12 @@ router.route('/ragister').post(
     router.route("/logout").post(verifyJWT, logoutUser);
     // Refresh access token route
 
-    router.route("/refreshToken").post( refreshAccessToken);
-    router.route("/changed passward").post(verifyJWT,changeCurrentPassward);
-    router.route("/current user").get(verifyJWT,getCurrentUser);
-    router.route("/getCurrentUser").patch(verifyJWT,updateUserProfile);
-    router.route("/update avatar").patch(verifyJWT, upload.single("avtar"),updateUserAvtar);
-    router.route("/coverimage").patch(verifyJWT,upload.single("coverImage"),updateUserCoverImage);
+    router.route("/refreshToken").post(refreshAccessToken);
+    router.route("/changed-passward").post(verifyJWT,changeCurrentPassward);
+    router.route("/current_user").get(verifyJWT,getCurrentUser);
+    router.route("/updateUserProfile").patch(verifyJWT,updateUserProfile);
+    router.route("/update-avatar").patch(verifyJWT, upload.single("avatar"),updateUserAvtar);
+    router.route("/updatecoverimage").patch(verifyJWT,upload.single("coverImage"),updateUserCoverImage);
     router.route("/c/:Username").get(verifyJWT,getUserChennalProfile)
     router.route("/userhistory").get(verifyJWT,WatchHistory)
 

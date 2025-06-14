@@ -5,7 +5,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import { Subscription } from "../models/subscription.model.js";
-import { Mongoose } from "mongoose";
+import mongoose, { Mongoose } from "mongoose";
 import { application } from "express";
 const registerUser = asyncHandler(async (req, res) => {
 
@@ -238,7 +238,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 
 // upadate user profile
 const updateUserProfile = asyncHandler(async (req, res) => {
-  const { FullName, email } = req.body;
+  const { FullName, email } = req.body
   if (!FullName || !email) {
     throw new ApiError(400, "Full name and email are required");
   }
@@ -274,14 +274,14 @@ const updateUserAvtar = asyncHandler(async(req,res)=>{
     throw new ApiError(400,"errror while uploading on avatar")
   }
 
-  const user = await findByIdAndUpdate(
+  const user = await User.findByIdAndUpdate(
     req.user?._id,
     {
     $set:{
       avatar :avatar.url
     }
     },{new :true}
-  ).select("-passward")
+  ).select("-password")
 
    return res
   .status(200)
@@ -299,13 +299,13 @@ const updateUserCoverImage = asyncHandler(async(req,res)=>{
   }
 
   const coverImage= await uploadOnCloudinary
-  (avatarLocalPath)
+  (coverImageLocalPath)
 
   if(!coverImage.url){
     throw new ApiError(400,"errror while uploading on  CoverImage")
   }
 
-  const user = await findByIdAndUpdate(
+  const user = await User.findByIdAndUpdate(
     req.user?._id,
     {
     $set:{
@@ -403,7 +403,7 @@ const WatchHistory = asyncHandler(async(req,res)=>{
 const user = await User.aggregate([
  {
   $match:{
-    _id: new Mongoose.Types.Objectid(req.user._id)
+    _id: new mongoose.Types.ObjectId(req.user?._id)
   }
  },
  {
